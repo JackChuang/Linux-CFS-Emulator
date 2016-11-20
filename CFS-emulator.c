@@ -63,6 +63,7 @@ void *balancer(void *arg);
 
 int main(int argc, char const *argv[])
 {
+    int i;
 	pthread_t producer_thread, balancer_thread;
 	pthread_t consumer_thread[NUM_CPU];
 	pthread_attr_t thread_attr;
@@ -104,8 +105,8 @@ int main(int argc, char const *argv[])
         exit(EXIT_FAILURE);
     }
     
-    //create 4 CPU threads
-	for (int i=0; i<NUM_CPU; i++)
+    //create 4 CPU thread
+	for (i=0; i<NUM_CPU; i++)
 	{
 		cpu_count[i] = i;
     	res = pthread_create(&consumer_thread[i], \
@@ -136,6 +137,7 @@ int main(int argc, char const *argv[])
 //*****************************************************************************
 void *producer(void *arg)
 {
+    int i,j;
 	FILE *file; //file descriptor
 	char line[100]; //store a line of the text file
 	struct process_t process; //store
@@ -164,13 +166,13 @@ void *producer(void *arg)
 		b_value = n_process/NUM_CPU;
 	}
 	//Initially, each CPU has 0 process in the queue
-	for (int i = 0; i < NUM_CPU; i++)
+	for (i = 0; i < NUM_CPU; i++)
 	{
 		p_count[i]= 0;
 	}
 	//Initialize the queue for each CPU
-	for (int i = 0; i< NUM_CPU; i++)
-		for (int j=0; j<NUM_QUEUE; j++)
+	for (i = 0; i< NUM_CPU; i++)
+		for (j=0; j<NUM_QUEUE; j++)
 		{
 			init_queue(&RQ[i][j]);//init queue
 			//init queue mutex
@@ -260,6 +262,7 @@ struct process_t ltop(char *line)
 //*****************************************************************************
 void process_status(void)
 {
+    int i,j,k;
 	struct process_t process;
 	struct queue_t queue;
 	struct queue_t RQ_snapshot[NUM_CPU][NUM_QUEUE];
@@ -268,11 +271,11 @@ void process_status(void)
 	printf("%-3s | %-12s | %-3s | %-8s | %-11s | %-4s | %-9s \n",\
 		   "PID", "SCHED_SCHEME", "CPU", "last_CPU", "static_prio", "prio",		\
 		   "exec_time");
-	for (int i = 0; i<NUM_CPU; i++)
-		for (int j = 0; j<NUM_QUEUE; j++)
+	for (i = 0; i<NUM_CPU; i++)
+		for (j = 0; j<NUM_QUEUE; j++)
 		{
 			queue = RQ_snapshot[i][j];
-			for (int k = queue.out; k<queue.in; k++)	
+			for (k = queue.out; k<queue.in; k++)	
 			{
 				process = queue.pool[k];
 				printf("%-3d | %-12s | %-3d | %-8d | %-11d | %-4d | %-9d \n",\
@@ -295,12 +298,13 @@ void process_status(void)
 //*****************************************************************************
 void *consumer(void *arg)
 {
+    int i;
 	int CPU = *(int*)arg;//CPU number assigned from for this consumer;
 	struct process_t *process;
 	printf("[CPU %i]: CPU %i thread has been created.\n",CPU, CPU);
 	while (running)
 	{	
-		for (int i = 0; i<NUM_QUEUE; i++) // go thru each queue
+		for (i = 0; i<NUM_QUEUE; i++) // go thru each queue
 		{
 			while (running) //continuously executes processes in the queue
 			{

@@ -4,7 +4,7 @@ CFLAGS = -Wall -c -lpthread -D$(DEBUG)
 LFLAGS = -Wall -lpthread -D$(DEBUG)
 all: CFS-emulator
 CFS-emulator: CFS-emulator.o util.o 
-	$(CC) $(LFLAGS) CFS-emulator.o util.o -o CFS-emulator
+	$(CC) CFS-emulator.o util.o -o CFS-emulator $(LFLAGS)
 CFS-emulator.o: CFS-emulator.c util.h
 	$(CC) $(CFLAGS) CFS-emulator.c
 util.o: util.c util.h sched.h
